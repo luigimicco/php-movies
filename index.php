@@ -3,7 +3,7 @@
 
 include __DIR__ . '/includes/open_db_conn.php';
 
-$query = "SELECT `id`, `title` FROM `movies` ORDER BY `id`";
+$query = "SELECT `movies`.`id`, `title`, `name` FROM `movies` LEFT JOIN `categories` ON `movies`.`category_id` =`categories`.`id` ORDER BY `id`";
 
 $result = $conn->query($query);
 
@@ -16,13 +16,13 @@ if (!$result) {
 $movies = [];
 
 if ($result && $result->num_rows > 0) {
-  while ($movie = $result->fetch_assoc()) {
-
+  while ($movie = $result->fetch_assoc()) {    // fetch_object
     $movies[] = $movie;
   }
 }
 
 $conn->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -46,6 +46,7 @@ $conn->close();
           <tr>
             <th>Id</th>
             <th>Title</th>
+            <th>Category</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -54,6 +55,7 @@ $conn->close();
             <tr>
               <td><?= $movie['id'] ?></td>
               <td><?= $movie['title'] ?></td>
+              <td><?= $movie['name'] ?></td>
               <td class="d-flex align-items-center">
 
                 <a href="edit_movie.php?id=<?= $movie['id'] ?>" class="btn btn-sm btn-warning me-2"><i class="fa fa-pencil"></i></a>
@@ -70,6 +72,11 @@ $conn->close();
             </tr>
           <?php endforeach; ?>
         </tbody>
+        <tfooter>
+        <tr>
+          <td colspan="4" class="text-end" ><?= count($movies) ?> film</td>
+        </tr>    
+        </tfooter>
       </table>
 
     </main>

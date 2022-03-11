@@ -7,6 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 
 $title = $_POST['title'] ?? false;
+$category_id = $_POST['category_id'] ?? false;
 
 if (!$title) {
   http_response_code(400);
@@ -15,7 +16,7 @@ if (!$title) {
 
 include __DIR__ . '/includes/open_db_conn.php';
 
-$sql = $conn->prepare("INSERT INTO movies (title) VALUES (?)");
-$sql->bind_param('s', $title);
+$sql = $conn->prepare("INSERT INTO movies (title, category_id) VALUES (?,?)");
+$sql->bind_param('si', $title, $category_id);
 
 include __DIR__ . '/includes/exec_and_close_db.php';
