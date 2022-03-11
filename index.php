@@ -1,9 +1,10 @@
 <?php
 // Eseguo la mia query
 
+include_once __DIR__ .'/models/Movie.php';
 include __DIR__ . '/includes/open_db_conn.php';
 
-$query = "SELECT `movies`.`id`, `title`, `name` FROM `movies` LEFT JOIN `categories` ON `movies`.`category_id` =`categories`.`id` ORDER BY `id`";
+$query = "SELECT `id`, `title` FROM `movies` ORDER BY `id`";
 
 $result = $conn->query($query);
 
@@ -16,10 +17,34 @@ if (!$result) {
 $movies = [];
 
 if ($result && $result->num_rows > 0) {
-  while ($movie = $result->fetch_assoc()) {    // fetch_object
+  while ($arr_movie = $result->fetch_assoc()) {    // fetch_object //fetch_assoc 
+    
+    $movie = new Movie($arr_movie['title'], $arr_movie['category_id']);
+    $movie->setId($arr_movie['id']);
     $movies[] = $movie;
   }
 }
+
+
+$query ="SELECT * FROM categories ORDER BY `name` ASC";
+$result = $conn->query($query);
+
+if (!$result) {
+  echo 'Si è verificato un errore';
+  var_dump($query);
+  exit();
+}
+
+$categories = [];
+
+if ($result && $result->num_rows > 0) {
+  while ($cat = $result->fetch_assoc()) {
+    $categories[$cat['id']] = $cat['name'];
+  }
+}
+
+
+
 
 $conn->close();
 
@@ -53,15 +78,15 @@ $conn->close();
         <tbody>
           <?php foreach ($movies as $movie) : ?>
             <tr>
-              <td><?= $movie['id'] ?></td>
-              <td><?= $movie['title'] ?></td>
-              <td><?= $movie['name'] ?></td>
+              <td><?= $movie->getId() ?></td>
+              <td><?= $movie->getTitle() ?></td>
+              <td><?= $categories[$movie->getCategory()] ?></td>
               <td class="d-flex align-items-center">
 
-                <a href="edit_movie.php?id=<?= $movie['id'] ?>" class="btn btn-sm btn-warning me-2"><i class="fa fa-pencil"></i></a>
+                <a href="edit_movie.php?id=<?= $movie->getId() ?>" class="btn btn-sm btn-warning me-2"><i class="fa fa-pencil"></i></a>
 
                 <form action="destroy_movie.php" method="POST" class="delete-form">
-                  <input type="hidden" name="id" value="<?= $movie['id'] ?>" />
+                  <input type="hidden" name="id" value="<?= $movie->getId() ?>" />
                   <button type="submit" class="btn btn-sm btn-danger">
                     <i class="fa fa-trash"></i>
                   </button>
